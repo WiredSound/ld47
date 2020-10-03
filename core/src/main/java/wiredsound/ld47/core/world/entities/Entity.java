@@ -3,7 +3,7 @@ package wiredsound.ld47.core.world.entities;
 import playn.core.Surface;
 import wiredsound.ld47.core.world.World;
 
-abstract class Entity {
+public abstract class Entity {
 	public final String name;
 
 	// Position on screen:

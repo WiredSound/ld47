@@ -4,15 +4,22 @@ import java.util.HashMap;
 
 import playn.core.Surface;
 import playn.core.Tile;
+import playn.scene.Layer;
 
-class WorldLayer {
-	private WorldTile[][] tiles;
+class WorldLayer extends Layer {
+	private final int tileSize;
 	private final int width, height;
+	private final HashMap<WorldTile, Tile> worldTileTextures;
 
-	WorldLayer(int width, int height, String data) {
-		tiles = new WorldTile[width][height];
+	private WorldTile[][] tiles;
+
+	WorldLayer(int tileSize, int width, int height, HashMap<WorldTile, Tile> worldTileTextures, String data) {
+		this.tileSize = tileSize;
 		this.width = width;
 		this.height = height;
+		this.worldTileTextures = worldTileTextures;
+
+		tiles = new WorldTile[width][height];
 
 		String[] lines = data.split("\\n");
 
@@ -26,7 +33,8 @@ class WorldLayer {
 		}
 	}
 
-	void draw(Surface surf, int tileSize, HashMap<WorldTile, Tile> worldTileTextures) {
+	@Override
+	protected void paintImpl(Surface surf) {
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
 				WorldTile tile = tiles[x][y];

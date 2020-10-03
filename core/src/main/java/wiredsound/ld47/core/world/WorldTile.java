@@ -1,6 +1,6 @@
 package wiredsound.ld47.core.world;
 
-public enum WorldTile {
+enum WorldTile {
 	NOTHING(-1, 0),
 	WOOD_FLOORING(12, Colours.BROWN),
 	BRICKS(22, Colours.DARK_GREY),

@@ -8,16 +8,15 @@ import playn.core.Image;
 import playn.core.Keyboard;
 import playn.core.Keyboard.KeyEvent;
 import playn.core.Platform;
-import playn.core.Surface;
 import playn.core.Texture;
 import playn.core.Texture.Config;
 import playn.core.Tile;
-import playn.scene.Layer;
 import react.Slot;
+import wiredsound.ld47.core.UpdatableLayer;
 import wiredsound.ld47.core.world.entities.Direction;
 import wiredsound.ld47.core.world.entities.Human;
 
-public class World extends Layer {
+public class World extends UpdatableLayer {
 	// Size in pixels of each tile:
 	public static final int TILE_SIZE = 16;
 
@@ -32,6 +31,8 @@ public class World extends Layer {
 	// Layers of the currently loaded world area/map:
 	private WorldLayer topLayer, blockingLayer, bottomLayer;
 
+	private EntityLayer entitiesLayer;
+
 	// Map world map tiles to tileset texture tiles:
 	private HashMap<WorldTile, Tile> worldTileTextures = new HashMap<WorldTile, Tile>();
 
@@ -39,7 +40,9 @@ public class World extends Layer {
 	private int tileColourTimer = 0;
 
 	public World(final Platform plat) {
-		super.setScale(4);
+		super(plat);
+
+		setScale(4);
 
 		plat.assets().getImage(TILESET_PATH).state.onSuccess(new Slot<Image>() {
 			@Override
@@ -68,6 +71,10 @@ public class World extends Layer {
 						tileset.tile(4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, TILE_SIZE)
 					}
 				);
+
+				entitiesLayer = new EntityLayer(player, TILE_SIZE);
+				add(entitiesLayer);
+
 				System.out.println("Created player character");
 
 				worldTileTextures.put(WorldTile.WOOD_FLOORING, tileset.tile(2 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
@@ -85,6 +92,8 @@ public class World extends Layer {
 				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_TOP, tileset.tile(TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_BOTTOM, tileset.tile(TILE_SIZE, 6 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				System.out.println("Prepared world tiles");
+
+				loadMap(plat.assets(), "bridge");
 			}
 		});
 
@@ -112,8 +121,6 @@ public class World extends Layer {
 				}
 			}
 		});
-
-		loadMap(plat.assets(), "bridge");
 	}
 
 	public boolean allowMovementTo(float x, float y, Direction d) {
@@ -140,7 +147,8 @@ public class World extends Layer {
 		return true;
 	}
 
-	public void update(int time) {
+	@Override
+	public UpdatableLayer update(int time) {
 		if(player != null) player.update(this, time);
 
 		tileColourTimer += time;
@@ -150,34 +158,43 @@ public class World extends Layer {
 			WorldTile.BRIDGE_LIGHT_TOP.nextColour();
 			WorldTile.BRIDGE_LIGHT_BOTTOM.nextColour();
 		}
+
+		return this;
 	}
 
-	@Override
-	protected void paintImpl(Surface surf) {
-		surf.clear(0.08f, 0.08f, 0.08f, 1.0f);
-
-		if(bottomLayer != null) bottomLayer.draw(surf, TILE_SIZE, worldTileTextures);
-		if(blockingLayer != null) blockingLayer.draw(surf, TILE_SIZE, worldTileTextures);
-
-		if(player != null) player.draw(surf, TILE_SIZE);
-
-		if(topLayer != null) topLayer.draw(surf, TILE_SIZE, worldTileTextures);
-	}
-
-	private void loadMap(Assets assets, String mapName) {
+	private void loadMap(final Assets assets, final String mapName) {
 		System.out.println("Loading map: " + mapName);
 
-		assets.getText(MAP_DIRECTORY_PATH + mapName + "_top.csv").onSuccess(new Slot<String>() {
-			@Override
-			public void onEmit(String data) { topLayer = new WorldLayer(LAYER_WIDTH, LAYER_HEIGHT, data); }
-		});
-		assets.getText(MAP_DIRECTORY_PATH + mapName + "_blocking.csv").onSuccess(new Slot<String>() {
-			@Override
-			public void onEmit(String data) { blockingLayer = new WorldLayer(LAYER_WIDTH, LAYER_HEIGHT, data); }
-		});
 		assets.getText(MAP_DIRECTORY_PATH + mapName + "_bottom.csv").onSuccess(new Slot<String>() {
 			@Override
-			public void onEmit(String data) { bottomLayer = new WorldLayer(LAYER_WIDTH, LAYER_HEIGHT, data); }
+			public void onEmit(String data) {
+				if(bottomLayer != null) remove(bottomLayer);
+				bottomLayer = new WorldLayer(TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT, worldTileTextures, data);
+				add(bottomLayer);
+
+				assets.getText(MAP_DIRECTORY_PATH + mapName + "_blocking.csv").onSuccess(new Slot<String>() {
+					@Override
+					public void onEmit(String data) {
+						if(blockingLayer != null) remove(blockingLayer);
+						blockingLayer = new WorldLayer(TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT, worldTileTextures, data);
+						add(blockingLayer);
+
+						// TODO: Load any entities specific to this map...
+
+						remove(entitiesLayer);
+						add(entitiesLayer);
+
+						assets.getText(MAP_DIRECTORY_PATH + mapName + "_top.csv").onSuccess(new Slot<String>() {
+							@Override
+							public void onEmit(String data) {
+								if(topLayer != null) remove(topLayer);
+								topLayer = new WorldLayer(TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT, worldTileTextures, data);
+								add(topLayer);
+							}
+						});
+					}
+				});
+			}
 		});
 	}
 }
