@@ -7,7 +7,15 @@ public enum WorldTile {
 	CRACKED_BRICKS(13, Colours.DARK_GREY),
 	FANCY_BRICKS(17, Colours.DARK_GREY),
 	VENT_BRICKS(15, Colours.DARK_GREY),
-	BRIDGE_PARAPET(14, Colours.DARK_GREY);
+	BRIDGE_PARAPET(14, Colours.DARK_GREY),
+	BRIDGE_ARCHWAY_TOP_LEFT(18, Colours.DARK_GREY),
+	BRIDGE_ARCHWAY_TOP_RIGHT(19, Colours.DARK_GREY),
+	BRIDGE_ARCHWAY_LEFT(23, Colours.DARK_GREY),
+	BRIDGE_ARCHWAY_RIGHT(24, Colours.DARK_GREY),
+	BRIDGE_LIGHT_HOLDER_TOP(16, Colours.DARK_GREY),
+	BRIDGE_LIGHT_HOLDER_BOTTOM(21, Colours.DARK_GREY),
+	BRIDGE_LIGHT_TOP(26, Colours.YELLOW),
+	BRIDGE_LIGHT_BOTTOM(31, Colours.YELLOW);
 
 	final int id;
 	int colour = 0xFFFFFFFF;
@@ -29,5 +37,6 @@ public enum WorldTile {
 
 final class Colours {
 	public static final int BROWN = 0xFF2C1B0B;
-	public static final int DARK_GREY = 0xFF929292;
+	public static final int DARK_GREY = 0xFFABABAB;
+	public static final int YELLOW = 0xFFFFFF33;
 }

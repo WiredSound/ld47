@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="35" columns="5">
   <image source="../images/tileset.png" width="80" height="112"/>
  </tileset>
- <layer id="6" name="bottom" width="16" height="12">
+ <layer id="6" name="bottom" width="16" height="12" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -19,7 +19,7 @@
 16,24,25,23,23,23,24,25,16,24,25,23,14,23,24,25
 </data>
  </layer>
- <layer id="7" name="blocking" width="16" height="12">
+ <layer id="7" name="blocking" width="16" height="12" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

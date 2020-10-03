@@ -74,6 +74,15 @@ public class World extends Layer {
 				worldTileTextures.put(WorldTile.FANCY_BRICKS, tileset.tile(2 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				worldTileTextures.put(WorldTile.VENT_BRICKS, tileset.tile(0, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				worldTileTextures.put(WorldTile.BRIDGE_PARAPET, tileset.tile(4 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_ARCHWAY_TOP_LEFT, tileset.tile(3 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_ARCHWAY_TOP_RIGHT, tileset.tile(4 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_ARCHWAY_LEFT, tileset.tile(3 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_ARCHWAY_RIGHT, tileset.tile(4 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_HOLDER_TOP, tileset.tile(TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_HOLDER_BOTTOM, tileset.tile(TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_TOP, tileset.tile(TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_BOTTOM, tileset.tile(TILE_SIZE, 6 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				System.out.println("Prepared world tiles");
 			}
 		});
 
