@@ -1,0 +1,11 @@
+<module rename-to='ld47'>
+  <inherits name='playn.Scene'/>
+  <inherits name='GameAssets'/>
+
+  <source path='core'/>
+  <source path='html'/>
+
+  <public path="resources" />
+
+  <entry-point class='wiredsound.ld47.html.GameHtml'/>
+</module>
