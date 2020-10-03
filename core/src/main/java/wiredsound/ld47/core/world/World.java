@@ -3,13 +3,11 @@ package wiredsound.ld47.core.world;
 import java.util.HashMap;
 
 import playn.core.Assets;
-import playn.core.GL20;
 import playn.core.Image;
 import playn.core.Keyboard;
 import playn.core.Keyboard.KeyEvent;
 import playn.core.Platform;
 import playn.core.Texture;
-import playn.core.Texture.Config;
 import playn.core.Tile;
 import react.Slot;
 import wiredsound.ld47.core.UpdatableLayer;
@@ -47,8 +45,7 @@ public class World extends UpdatableLayer {
 		plat.assets().getImage(TILESET_PATH).state.onSuccess(new Slot<Image>() {
 			@Override
 			public void onEmit(Image image) {
-				// Ensure pixel art isn't blurry when scaled:
-				image.setConfig(new Config(true, false, false, GL20.GL_NEAREST, GL20.GL_NEAREST, false));
+				image.setConfig(TEXTURE_CONFIG);
 
 				Texture tileset = image.texture();
 				System.out.println("Loaded tilset texture successfully");

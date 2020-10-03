@@ -21,7 +21,7 @@ public class MainMenu extends UpdatableLayer {
 
 		Graphics gfx = plat.graphics();
 
-		Font font = new Font("Courier", Font.Style.PLAIN, 24);
+		Font font = new Font("Courier", Font.Style.PLAIN, 30);
 		TextLayout layout = gfx.layoutText("Ludum Dare 47 Entry by WiredSound", new TextFormat(font));
 
 		Canvas textCanvas = gfx.createCanvas(layout.size);
