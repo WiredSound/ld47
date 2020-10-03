@@ -35,9 +35,11 @@ public class World extends Layer {
 	// Map world map tiles to tileset texture tiles:
 	private HashMap<WorldTile, Tile> worldTileTextures = new HashMap<WorldTile, Tile>();
 
+	// For animating tiles through colour changes:
+	private int tileColourTimer = 0;
+
 	public World(final Platform plat) {
 		super.setScale(4);
-		System.out.println("(" + super.tx() + ", " + super.ty() + ")");
 
 		plat.assets().getImage(TILESET_PATH).state.onSuccess(new Slot<Image>() {
 			@Override
@@ -120,26 +122,34 @@ public class World extends Layer {
 
 		switch(d) {
 		case RIGHT:
-			return blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE) == WorldTile.NOTHING;
+			return blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
 
 		case LEFT:
-			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE) == WorldTile.NOTHING;
+			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
 
 		case DOWN:
-			return blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE) == WorldTile.NOTHING;
+			return blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
 
 		case UP:
-			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE) == WorldTile.NOTHING;
+			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
 		}
 		return true;
 	}
 
 	public void update(int time) {
 		if(player != null) player.update(this, time);
+
+		tileColourTimer += time;
+		if(tileColourTimer > 300) { // Change lamp colours ever 300ms:
+			tileColourTimer = 0;
+
+			WorldTile.BRIDGE_LIGHT_TOP.nextColour();
+			WorldTile.BRIDGE_LIGHT_BOTTOM.nextColour();
+		}
 	}
 
 	@Override

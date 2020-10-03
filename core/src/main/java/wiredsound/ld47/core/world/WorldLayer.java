@@ -32,15 +32,16 @@ class WorldLayer {
 				WorldTile tile = tiles[x][y];
 
 				Tile texture = worldTileTextures.get(tile);
-				if(texture != null) surf.draw(texture, tile.colour, x * tileSize, y * tileSize, tileSize, tileSize);
+				if(texture != null) surf.draw(texture, tile.getColour(), x * tileSize, y * tileSize, tileSize, tileSize);
 			}
 		}
 	}
 
-	WorldTile getTileAt(float x, float y, int tileSize) {
+	WorldTile getTileAt(float x, float y, int tileSize, int layerWidth, int layerHeight) {
 		int gridX = (int) Math.floor(x / tileSize);
 		int gridY = (int) Math.floor(y / tileSize);
 
-		return tiles[gridX][gridY];
+		if(gridX >= 0 && gridY >= 0 && gridX < layerWidth && gridY < layerHeight) return tiles[gridX][gridY];
+		else return WorldTile.NOTHING;
 	}
 }
