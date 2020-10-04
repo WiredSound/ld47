@@ -1,6 +1,6 @@
-# Ludum Dare 47 Entry
+# Ludum Dare 47 Entry (Stuck in a Loop)
 
-**Stuck in a Loop**
+**Please excuse the spaghetti code!**
 
 ## Gameplay
 
