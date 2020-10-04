@@ -9,11 +9,13 @@ import playn.core.Json.TypedArray;
 import playn.core.Keyboard;
 import playn.core.Keyboard.KeyEvent;
 import playn.core.Platform;
+import playn.core.Sound;
 import playn.core.Texture;
 import playn.core.Tile;
 import react.Slot;
 import wiredsound.ld47.core.UpdatableLayer;
 import wiredsound.ld47.core.ui.TextBox;
+import wiredsound.ld47.core.vn.VisualNovel;
 import wiredsound.ld47.core.world.entities.Direction;
 import wiredsound.ld47.core.world.entities.Human;
 
@@ -52,6 +54,11 @@ public class World extends UpdatableLayer {
 	// Story objectives:
 	private boolean obtainedGoldCoin = false, obtainedScroll = false;
 
+	// Indicates when true that should transition to ending screens when moves up off the screen:
+	private boolean upToEnding;
+
+	//private Sound interactSfx, badInteractSfx;
+
 	public World(final Platform plat, final String mapName) {
 		super(plat);
 
@@ -70,6 +77,17 @@ public class World extends UpdatableLayer {
 				Texture tileset = image.texture();
 				System.out.println("Loaded tilset texture successfully");
 
+				System.out.println("Loading sound effects");
+
+				Sound stepSfx = plat.assets().getSound("audio/step");
+				stepSfx.setVolume(0.2f);
+
+				//interactSfx = plat.assets().getSound("audio/interact");
+				//interactSfx.setVolume(0.5f);
+
+				//badInteractSfx = plat.assets().getSound("audio/bad interact");
+				//badInteractSfx.setVolume(0.15f);
+
 				player = new Human("Player", 80, 80,
 					0xFFFFDBAC, 120, 0.06f,
 					tileset.tile(0, 0, TILE_SIZE, TILE_SIZE),
@@ -86,7 +104,8 @@ public class World extends UpdatableLayer {
 					new Tile[] {
 						tileset.tile(3 * TILE_SIZE, TILE_SIZE, TILE_SIZE, TILE_SIZE),
 						tileset.tile(4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, TILE_SIZE)
-					}
+					},
+					stepSfx
 				);
 
 				entitiesLayer = new EntityLayer(player, TILE_SIZE);
@@ -101,6 +120,7 @@ public class World extends UpdatableLayer {
 				addTile(WorldTile.CRACKED_BRICKS, tileset, 0, 4);
 				addTile(WorldTile.FANCY_BRICKS, tileset, 2, 3);
 				addTile(WorldTile.FANCY_BRICKS_END_LEFT, tileset, 4, 6);
+				addTile(WorldTile.FANCY_BRICKS_END_RIGHT, tileset, 1, 8);
 				addTile(WorldTile.VENT_BRICKS, tileset, 0, 3);
 				addTile(WorldTile.BRIDGE_PARAPET, tileset, 4, 2);
 				addTile(WorldTile.BRIDGE_PARAPET_END_LEFT, tileset, 4, 5);
@@ -130,6 +150,11 @@ public class World extends UpdatableLayer {
 				addTile(WorldTile.WELL_BOTTOM_LEFT, tileset, 3, 9);
 				addTile(WorldTile.WELL_BOTTOM_RIGHT, tileset, 4, 9);
 				addTile(WorldTile.NPC, tileset, 3, 0);
+				addTile(WorldTile.VERTICAL_PARAPET_LEFT, tileset, 2, 8);
+				addTile(WorldTile.VERTICAL_PARAPET_CONNECTING_LEFT, tileset, 1, 9);
+				addTile(WorldTile.VERTICAL_PARAPET_CONNECTING_LEFT_OTHER, tileset, 2, 9);
+				addTile(WorldTile.VERTICAL_PARAPET_RIGHT, tileset, 0, 9);
+				addTile(WorldTile.VERTICAL_PARAPET_CONNECTING_RIGHT, tileset, 0, 10);
 
 				System.out.println("Prepared world tiles");
 
@@ -167,20 +192,25 @@ public class World extends UpdatableLayer {
 
 						if(textBox.isComplete()) {
 							if(signTextLines != null && (blockingLookingAt == WorldTile.SIGN_BOTTOM || topLookingAt == WorldTile.SIGN_TOP) ){
+								//interactSfx.play();
 								textBox.reset();
 								for(String line : signTextLines) textBox.addPart(line);
 							}
 
 							if(blockingLookingAt == WorldTile.BUSH) {
+								//badInteractSfx.play();
 								textBox.reset();
 								textBox.addPart("I don't think rummaging around in a bush would be a good use of time right now.");
 							}
 							else if(blockingLookingAt == WorldTile.TREE_BOTTOM || topLookingAt == WorldTile.TREE_TOP) {
+								//badInteractSfx.play();
 								textBox.reset();
 								textBox.addPart("I doubt I could climb this tree.");
 							}
 							else if(blockingLookingAt == WorldTile.WELL_BOTTOM_LEFT || blockingLookingAt == WorldTile.WELL_BOTTOM_RIGHT ||
 									topLookingAt == WorldTile.WELL_TOP_LEFT || topLookingAt == WorldTile.WELL_TOP_RIGHT) {
+								//interactSfx.play();
+
 								textBox.reset();
 
 								textBox.addPart("It's a well.");
@@ -193,6 +223,8 @@ public class World extends UpdatableLayer {
 								obtainedGoldCoin = true;
 							}
 							else if(blockingLookingAt == WorldTile.NPC) {
+								//interactSfx.play();
+
 								textBox.reset();
 
 								textBox.addPart("You do know you shouldn't be here, correct? What do you want?");
@@ -271,7 +303,15 @@ public class World extends UpdatableLayer {
 
 			if(player.x <= 1) handlePlayerOffScreen(Direction.LEFT);
 			else if(player.x >= (LAYER_WIDTH - 1) * TILE_SIZE - 1) handlePlayerOffScreen(Direction.RIGHT);
-			if(player.y <= 1) handlePlayerOffScreen(Direction.UP);
+			if(player.y <= 1) {
+				if(upToEnding) {
+					String scriptName = obtainedScroll ? "good ending" : "bad ending";
+					System.out.println("Beginning end of game: " + scriptName);
+					return new VisualNovel(plat, scriptName);
+				}
+
+				handlePlayerOffScreen(Direction.UP);
+			}
 			else if(player.y >= (LAYER_HEIGHT - 1) * TILE_SIZE - 1) handlePlayerOffScreen(Direction.DOWN);
 		}
 
@@ -308,6 +348,8 @@ public class World extends UpdatableLayer {
 				offScreenMapNames.put(Direction.RIGHT, obj.getString("right map", ""));
 				offScreenMapNames.put(Direction.UP, obj.getString("up map", ""));
 				offScreenMapNames.put(Direction.DOWN, obj.getString("down map", ""));
+
+				upToEnding = obj.getBoolean("up to ending", false);
 			}
 		});
 
@@ -373,7 +415,11 @@ public class World extends UpdatableLayer {
 									remove(toppestLayer);
 									toppestLayer = null;
 								}
-							}});
+
+								remove(textBox);
+								add(textBox);
+							}
+						});
 					}
 				});
 			}

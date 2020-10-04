@@ -36,8 +36,14 @@ public class TextBox extends UpdatableLayer {
 
 	private ArrayList<TextLayout[]> parts = new ArrayList<TextLayout[]>();
 
+	//private Sound nextSfx;
+
 	public TextBox(Platform plat) {
 		super(plat);
+
+		// TODO: Don't load each time a text box instance is made!
+		//nextSfx = plat.assets().getSound("audio/next");
+		//nextSfx.setVolume(0.05f);
 
 		IDimension size = plat.graphics().viewSize;
 
@@ -96,6 +102,8 @@ public class TextBox extends UpdatableLayer {
 
 				if(lines.length > 0) {
 					System.out.println("Showing next section in text box: " + lines[0].text);
+
+					//nextSfx.play();
 
 					Canvas canvas = gfx.createCanvas(lines[0].size.width(), lines[0].size.height() * lines.length);
 					canvas.setFillColor(TEXT_COLOUR);

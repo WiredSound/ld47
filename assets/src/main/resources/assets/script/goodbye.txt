@@ -1,0 +1,7 @@
+...
+I remain stuck in the loop.
+The cycle continues.
+...
+This game was created by Max B. (WiredSound) in under 48 hours for the 47th Ludum Dare game jam.
+Thank you for playing and I hope you enjoyed.
+next script:opening

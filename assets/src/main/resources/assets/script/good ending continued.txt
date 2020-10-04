@@ -1,0 +1,11 @@
+background:whale/planet,006400,008D00,0.00075
+background:whale/whale,1212FF,4141FF,0.0002
+The sky beast speaks to me.
+It does not offer me sanctuary from this dying planet.
+Instead, it makes apparent my arrogance.
+The arrogance of mankind.
+Who am I to call upon such a majestic creature to shoulder my burdens?
+...
+The creature begins its journey back into deep space.
+-- ending 2 of 2 --
+next script:goodbye

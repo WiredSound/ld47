@@ -2,6 +2,7 @@ package wiredsound.ld47.core.world.entities;
 
 import java.util.ArrayList;
 
+import playn.core.Sound;
 import playn.core.Surface;
 import playn.core.Tile;
 import wiredsound.ld47.core.world.World;
@@ -25,11 +26,14 @@ public class Human extends Entity {
 	private final int movementAnimationSpeed;
 	private final float movementSpeed;
 
+	private Sound stepSfx;
+
 	public Human(String name, float x, float y,
 				 int colour, int animationSpeed, float movementSpeed,
 				 Tile facingRightTile, Tile[] movingRightTiles,
 				 Tile facingForwardTile, Tile[] movingForwardTiles,
-				 Tile facingBackwardTile, Tile[] movingBackwardTiles) {
+				 Tile facingBackwardTile, Tile[] movingBackwardTiles,
+				 Sound stepSfx) {
 		super(name, x, y);
 		this.colour = colour;
 		this.movementAnimationSpeed = animationSpeed;
@@ -40,6 +44,8 @@ public class Human extends Entity {
 		this.movingForwardTiles = movingForwardTiles;
 		this.facingBackwardTile = facingBackwardTile;
 		this.movingBackwardTiles = movingBackwardTiles;
+		//stepSfx.prepare();
+		this.stepSfx = stepSfx;
 	}
 
 	public void move(Direction d) {
@@ -77,6 +83,8 @@ public class Human extends Entity {
 			if(movementAnimationTimer >= movementAnimationSpeed) {
 				movementAnimationTimer = 0;
 				movementFrame = movementFrame == 1 ? 0 : 1;
+
+				if(stepSfx.isLoaded()) stepSfx.play();
 			}
 
 			float newX, newY;

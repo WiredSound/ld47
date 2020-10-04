@@ -1,0 +1,13 @@
+The view from the top of the tower is incredible.
+Immersed in the scenery, I almost forget the reason I even came here.
+...
+I wait for any indication of the supposed creatures in the sky.
+...
+Hours pass without sign of the whales.
+...
+The sun sets and rises.
+...
+I am trapped on this dying planet.
+-- ending 1 of 2 --
+Hint: Explore the forest around the bridge before climbing the tower in order to get the second ending.
+next script:goodbye
