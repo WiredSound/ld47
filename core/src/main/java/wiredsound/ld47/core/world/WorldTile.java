@@ -36,7 +36,8 @@ enum WorldTile {
 	WELL_TOP_LEFT(43, Colours.DARK_GREY),
 	WELL_TOP_RIGHT(44, Colours.DARK_GREY),
 	WELL_BOTTOM_LEFT(48, Colours.DARK_GREY),
-	WELL_BOTTOM_RIGHT(49, Colours.DARK_GREY);
+	WELL_BOTTOM_RIGHT(49, Colours.DARK_GREY),
+	NPC(3, 0xFFAF8865);
 
 	final int id;
 	int[] colours;

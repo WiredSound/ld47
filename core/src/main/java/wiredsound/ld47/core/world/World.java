@@ -50,7 +50,7 @@ public class World extends UpdatableLayer {
 	private HashMap<Direction, String> offScreenMapNames = new HashMap<Direction, String>();
 
 	// Story objectives:
-	private boolean obtainedGoldCoin = false;
+	private boolean obtainedGoldCoin = false, obtainedScroll = false;
 
 	public World(final Platform plat, final String mapName) {
 		super(plat);
@@ -129,6 +129,7 @@ public class World extends UpdatableLayer {
 				addTile(WorldTile.WELL_TOP_RIGHT, tileset, 4, 8);
 				addTile(WorldTile.WELL_BOTTOM_LEFT, tileset, 3, 9);
 				addTile(WorldTile.WELL_BOTTOM_RIGHT, tileset, 4, 9);
+				addTile(WorldTile.NPC, tileset, 3, 0);
 
 				System.out.println("Prepared world tiles");
 
@@ -186,8 +187,32 @@ public class World extends UpdatableLayer {
 								textBox.addPart("Unsuprisingly, it appears to have dried up long ago.");
 								textBox.addPart("Looks like there might be something at the bottom...");
 								textBox.addPart("(Antique gold coin found!)");
+								textBox.addPart("The marking of this coin are quite unlike anything I've ever seen before.");
+								textBox.addPart("It does not look like something of this world.");
 
 								obtainedGoldCoin = true;
+							}
+							else if(blockingLookingAt == WorldTile.NPC) {
+								textBox.reset();
+
+								textBox.addPart("You do know you shouldn't be here, correct? What do you want?");
+								textBox.addPart("...");
+
+								if(obtainedGoldCoin) {
+									textBox.addPart("Where did you find this? This coin?");
+									textBox.addPart("In exchange for such an artifact, I suppose I could assist you...");
+									textBox.addPart("(Obtained a scroll!)");
+									textBox.addPart("You see the tower at the end of that bridge? Read this scroll aloud at the very top of it.");
+									textBox.addPart("A word of advice however... Breaking free of this cycle will certainly not be as easy as you may hope.");
+									textBox.addPart("Good luck.");
+
+									obtainedScroll = true;
+								}
+								else {
+									textBox.addPart("How do you know of them? Who told you?");
+									textBox.addPart("... Perhaps I can help you, but it won't be out of the goodness of my heart.");
+									textBox.addPart("If you haven't got anything valuable to offer me in return then I'm not interested I'm afraid.");
+								}
 							}
 						}
 
