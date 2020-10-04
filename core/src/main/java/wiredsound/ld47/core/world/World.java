@@ -128,8 +128,19 @@ public class World extends UpdatableLayer {
 					case DOWN: case S: d = Direction.DOWN; break;
 
 					case E: case ENTER:
-						// TODO: Check next to sign.
-						if(textBox.isComplete() && signTextLines != null) {
+						float lookingAtX = player.getX() + TILE_SIZE / 2;
+						float lookingAtY = player.getY() + TILE_SIZE / 2;
+
+						switch(player.getFacingDirection()) {
+						case UP: lookingAtY -= TILE_SIZE * 0.6; break;
+						case DOWN: lookingAtY += TILE_SIZE * 0.4; break;
+						case LEFT: lookingAtX -= TILE_SIZE * 0.6; break;
+						case RIGHT: lookingAtX += TILE_SIZE * 0.6; break;
+						}
+
+						if(textBox.isComplete() && signTextLines != null &&
+						   (blockingLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.SIGN_BOTTOM ||
+							topLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.SIGN_TOP)) {
 							System.out.println("Reading sign");
 							textBox.reset();
 							for(String line : signTextLines) textBox.addPart(line);

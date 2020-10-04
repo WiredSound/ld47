@@ -18,4 +18,7 @@ public abstract class Entity {
 	public abstract void update(World world, int time);
 
 	public abstract void draw(Surface surf, int tileSize);
+
+	public float getX() { return x; }
+	public float getY() { return y; }
 }

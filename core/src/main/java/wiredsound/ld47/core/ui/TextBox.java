@@ -17,6 +17,8 @@ import pythagoras.f.IDimension;
 import wiredsound.ld47.core.UpdatableLayer;
 
 public class TextBox extends UpdatableLayer {
+	private static final float SPEED = 1.25f;
+
 	private static final int TEXT_COLOUR = 0xFFCCCCCC;
 	private static final int BACKGROUND_COLOUR = 0xDD000000;
 
@@ -61,7 +63,7 @@ public class TextBox extends UpdatableLayer {
 
 		if(fadeIn) {
 			if(textBoxWidth < textBoxLayer.width() - 1) {
-				textBoxWidth += time * 0.8f;
+				textBoxWidth += time * SPEED;
 				if(textBoxWidth >= textBoxLayer.width()) textBoxWidth = textBoxLayer.width() - 1;
 			}
 			else {
@@ -72,7 +74,7 @@ public class TextBox extends UpdatableLayer {
 		}
 
 		if(fadeOut) {
-			textBoxWidth -= time * 0.8;
+			textBoxWidth -= time * SPEED;
 
 			if(textBoxWidth > 0) drawTextBox();
 			else setVisible(false);

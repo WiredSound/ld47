@@ -127,4 +127,6 @@ public class Human extends Entity {
 			(facingDirection == Direction.LEFT ? -tileSize : tileSize), tileSize
 		);
 	}
+
+	public Direction getFacingDirection() { return facingDirection; }
 }
