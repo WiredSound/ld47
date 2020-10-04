@@ -37,7 +37,7 @@ public class World extends UpdatableLayer {
 	// For animating tiles through colour changes:
 	private int tileColourTimer = 0;
 
-	public World(final Platform plat) {
+	public World(final Platform plat, final String mapName) {
 		super(plat);
 
 		setScale(4);
@@ -88,9 +88,14 @@ public class World extends UpdatableLayer {
 				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_HOLDER_BOTTOM, tileset.tile(TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_TOP, tileset.tile(TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				worldTileTextures.put(WorldTile.BRIDGE_LIGHT_BOTTOM, tileset.tile(TILE_SIZE, 6 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.GRASS, tileset.tile(TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.DIRT, tileset.tile(0, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.SIGN_TOP, tileset.tile(0, 5 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.SIGN_BOTTOM, tileset.tile(0, 6 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				worldTileTextures.put(WorldTile.MESSY_GRASS, tileset.tile(3 * TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 				System.out.println("Prepared world tiles");
 
-				loadMap(plat.assets(), "bridge");
+				loadMap(plat.assets(), mapName);
 			}
 		});
 

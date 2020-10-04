@@ -1,6 +1,0 @@
-background:whale/background,301934,3C1F41,0.0005
-background:whale/planet,5397CD,81BAE7,0.001
-background:whale/whale,0000AE,1212FF,0.0008
-This is the first line.
-And this right here is the second line (slightly longer). This part is really long and should hopefully be displayed across multiple lines...
-Now we have the third line - wow!

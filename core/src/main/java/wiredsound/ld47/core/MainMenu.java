@@ -7,7 +7,7 @@ import playn.core.Platform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.scene.ImageLayer;
-import wiredsound.ld47.core.world.World;
+import wiredsound.ld47.core.vn.VisualNovel;
 
 public class MainMenu extends UpdatableLayer {
 	private static final float FADE_SPEED = 0.0006f;
@@ -44,7 +44,7 @@ public class MainMenu extends UpdatableLayer {
 			if(alpha > 0) setAlpha(alpha - change);
 			else {
 				setAlpha(1);
-				return new World(plat);
+				return new VisualNovel(plat, "opening");
 			}
 		}
 

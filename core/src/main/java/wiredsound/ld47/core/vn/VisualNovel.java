@@ -9,6 +9,7 @@ import playn.core.Platform;
 import react.Slot;
 import wiredsound.ld47.core.UpdatableLayer;
 import wiredsound.ld47.core.ui.TextBox;
+import wiredsound.ld47.core.world.World;
 
 public class VisualNovel extends UpdatableLayer {
 	private static final String SCRIPT_DIRECTORY_PATH = "script/";
@@ -18,11 +19,12 @@ public class VisualNovel extends UpdatableLayer {
 
 	private ArrayList<Background> backgrounds = new ArrayList<Background>();
 
+	private String nextScriptName = "", nextMapName = "";
+
 	public VisualNovel(Platform plat, String scriptName) {
 		super(plat);
 
 		textBox = new TextBox(plat);
-		add(textBox);
 
 		loadScript(scriptName);
 
@@ -37,11 +39,28 @@ public class VisualNovel extends UpdatableLayer {
 	@Override
 	public UpdatableLayer update(int time) {
 		for(Background bg : backgrounds) bg.update(time);
-		if(textBox != null) textBox.update(time);
+
+		if(textBox != null) {
+			textBox.update(time);
+
+			if(textBox.isComplete()) {
+				if(!nextScriptName.isEmpty()) {
+					textBox.reset();
+					loadScript(nextScriptName);
+					nextScriptName = "";
+				}
+				else if(!nextMapName.isEmpty()) {
+					return new World(plat, nextMapName);
+				}
+			}
+		}
+
 		return this;
 	}
 
 	public void loadScript(String name) {
+		removeAll();
+
 		String path = SCRIPT_DIRECTORY_PATH + name + ".txt";
 
 		System.out.println("Loading script: " + path);
@@ -60,11 +79,18 @@ public class VisualNovel extends UpdatableLayer {
 						float speed = Float.parseFloat(backgroundInfo[3].trim());
 
 						System.out.println("Using background: " + path);
-						System.out.println(Color.red(startColour) + ", " + Color.red(endColour));
 
 						Background bg = new Background(plat, path, startColour, endColour, speed);
 						backgrounds.add(bg);
 						add(bg);
+					}
+					else if(line.startsWith("next script:")) {
+						nextScriptName = line.split(":")[1].trim();
+						System.out.println("The script to follow this one has been specified: " + nextScriptName);
+					}
+					else if(line.startsWith("next map:")) {
+						nextMapName = line.split(":")[1].trim();
+						System.out.println("Map to load following this script has been specified: " + nextMapName);
 					}
 					else {
 						System.out.println("Loaded line of script: " + line);
@@ -73,7 +99,6 @@ public class VisualNovel extends UpdatableLayer {
 					}
 				}
 
-				if(textBox != null) remove(textBox);
 				add(textBox);
 			}
 		});

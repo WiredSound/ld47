@@ -15,7 +15,12 @@ enum WorldTile {
 	BRIDGE_LIGHT_HOLDER_TOP(16, Colours.DARK_GREY),
 	BRIDGE_LIGHT_HOLDER_BOTTOM(21, Colours.DARK_GREY),
 	BRIDGE_LIGHT_TOP(26, Colours.LAMP_COLOURS),
-	BRIDGE_LIGHT_BOTTOM(31, Colours.LAMP_COLOURS);
+	BRIDGE_LIGHT_BOTTOM(31, Colours.LAMP_COLOURS),
+	GRASS(11, Colours.DARK_GREEN),
+	DIRT(10, Colours.BROWN),
+	SIGN_TOP(25, Colours.LIGHT_BROWN),
+	SIGN_BOTTOM(30, Colours.LIGHT_BROWN),
+	MESSY_GRASS(28, Colours.GREEN);
 
 	final int id;
 	int[] colours;
@@ -50,4 +55,7 @@ final class Colours {
 	public static final int YELLOW = 0xFFFFFF00;
 	public static final int DARK_YELLOW = 0xFFE5E500;
 	public static final int[] LAMP_COLOURS = new int[] { DARK_YELLOW, YELLOW, LIGHT_YELLOW, YELLOW };
+	public static final int DARK_GREEN = 0xFF013208;
+	public static final int LIGHT_BROWN = 0xFFB5651D;
+	public static final int GREEN = 0xFF014F0C;
 }

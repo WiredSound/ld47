@@ -1,0 +1,9 @@
+background:whale/background,301934,431C53,0.0004
+background:whale/planet,5397CD,74BBF4,0.00075
+background:whale/whale,1212FF,4141FF,0.00055
+I have but one hope of saving myself from certain death.
+I must join the whales.
+With Earth becoming increasingly uninhabitable, they fled to the stars.
+They now dwell in the void of space.
+I have identified a group also with the objective of contacting the whales. Today I hope to meet with its members.
+next map:start

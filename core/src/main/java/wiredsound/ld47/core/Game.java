@@ -3,7 +3,6 @@ package wiredsound.ld47.core;
 import playn.core.Clock;
 import playn.core.Platform;
 import playn.scene.SceneGame;
-import wiredsound.ld47.core.vn.VisualNovel;
 
 public class Game extends SceneGame {
 	private UpdatableLayer current;
@@ -12,8 +11,8 @@ public class Game extends SceneGame {
 		// Update every 17ms (approx. 60 FPS):
 		super(plat, 17);
 
-		//current = new MainMenu(plat);
-		current = new VisualNovel(plat, "test");
+		current = new MainMenu(plat);
+		//current = new VisualNovel(plat, "opening");
 		rootLayer.add(current);
 	}
 

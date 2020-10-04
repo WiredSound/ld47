@@ -28,7 +28,7 @@ public class TextBox extends UpdatableLayer {
 
 	private float textBoxWidth = 0;
 
-	private boolean fadeOut = false;
+	private boolean fadeIn = true, fadeOut = false;
 
 	private ArrayList<TextLayout[]> parts = new ArrayList<TextLayout[]>();
 
@@ -48,14 +48,17 @@ public class TextBox extends UpdatableLayer {
 
 	@Override
 	public UpdatableLayer update(int time) {
-		if(textLayer == null) {
+		if(textBoxWidth > 0) drawTextBox();
+
+		if(fadeIn) {
 			if(textBoxWidth < textBoxLayer.width() - 1) {
 				textBoxWidth += time * 0.8f;
 				if(textBoxWidth >= textBoxLayer.width()) textBoxWidth = textBoxLayer.width() - 1;
-
-				drawTextBox();
 			}
-			else { nextPart(); }
+			else {
+				fadeIn = false;
+				nextPart();
+			}
 		}
 
 		if(fadeOut) {
@@ -72,7 +75,7 @@ public class TextBox extends UpdatableLayer {
 		Graphics gfx = plat.graphics();
 
 		if(parts.isEmpty()) {
-			System.out.println("All script parts have already been displayed");
+			//System.out.println("All script parts have already been displayed");
 
 			textLayer.setVisible(false);
 			fadeOut = true;
@@ -103,9 +106,20 @@ public class TextBox extends UpdatableLayer {
 		}
 	}
 
+	public void reset() {
+		textBoxLayer.setVisible(true);
+		fadeOut = false;
+		fadeIn = true;
+		textBoxWidth = 0;
+	}
+
 	public void addPart(String line) {
 		TextLayout[] layouts = plat.graphics().layoutText(line, format, wrapping);
 		parts.add(layouts);
+	}
+
+	public boolean isComplete() {
+		return parts.isEmpty() && !textBoxLayer.visible();
 	}
 
 	private void drawTextBox() {
