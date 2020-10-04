@@ -3,8 +3,8 @@
         "North - Forest\nWest - Town",
         "East - Ruins"
     ],
-    "left": [ "text", [ "I won't survive if I give up now." ]],
-    "down": [ "text", [ "There is nothing of note in this direction." ]],
-    "right": [ "map", "bridge enterance" ],
-    "up" : [ "map", "forest enterance" ]
+    "left text": [ "I won't give up that easily." ],
+    "down text": [ "There is nothing of note in this direction." ],
+    "right map": "bridge",
+    "up map" : "forest enterance"
 }

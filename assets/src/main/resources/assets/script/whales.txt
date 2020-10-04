@@ -6,4 +6,5 @@ I must join the whales.
 With Earth becoming increasingly uninhabitable, they fled to the stars.
 They now dwell in the void of space.
 I have identified a group also with the objective of contacting the whales. Today I hope to meet with its members.
+(Use arrow keys or WASD to move. Press E to interact with the environment.)
 next map:start

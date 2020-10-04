@@ -43,6 +43,12 @@ public class World extends UpdatableLayer {
 	private TextBox textBox;
 	private TypedArray<String> signTextLines;
 
+	// Text displayed when moving off screen in a given direction:
+	private HashMap<Direction, TypedArray<String>> offScreenTextLines = new HashMap<Direction, TypedArray<String>>();
+
+	// Name of the map to transition to when the player moves off the screen in a given direction:
+	private HashMap<Direction, String> offScreenMapNames = new HashMap<Direction, String>();
+
 	public World(final Platform plat, final String mapName) {
 		super(plat);
 
@@ -128,22 +134,32 @@ public class World extends UpdatableLayer {
 					case DOWN: case S: d = Direction.DOWN; break;
 
 					case E: case ENTER:
-						float lookingAtX = player.getX() + TILE_SIZE / 2;
-						float lookingAtY = player.getY() + TILE_SIZE / 2;
+						float lookingAtX = player.x + TILE_SIZE / 2;
+						float lookingAtY = player.y + TILE_SIZE / 2;
 
 						switch(player.getFacingDirection()) {
 						case UP: lookingAtY -= TILE_SIZE * 0.6; break;
-						case DOWN: lookingAtY += TILE_SIZE * 0.4; break;
+						case DOWN: lookingAtY += TILE_SIZE * 0.6; break;
 						case LEFT: lookingAtX -= TILE_SIZE * 0.6; break;
 						case RIGHT: lookingAtX += TILE_SIZE * 0.6; break;
 						}
 
-						if(textBox.isComplete() && signTextLines != null &&
-						   (blockingLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.SIGN_BOTTOM ||
-							topLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.SIGN_TOP)) {
-							System.out.println("Reading sign");
-							textBox.reset();
-							for(String line : signTextLines) textBox.addPart(line);
+						final WorldTile blockingLookingAt = blockingLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT);
+						final WorldTile topLookingAt = topLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT);
+
+						if(textBox.isComplete() && signTextLines != null) {
+							if(blockingLookingAt == WorldTile.SIGN_BOTTOM || topLookingAt == WorldTile.SIGN_TOP) {
+								textBox.reset();
+								for(String line : signTextLines) textBox.addPart(line);
+							}
+							else if(blockingLookingAt == WorldTile.BUSH) {
+								textBox.reset();
+								textBox.addPart("I don't think rummaging around in a bush would be a good use of time right now.");
+							}
+							else if(blockingLookingAt == WorldTile.TREE_BOTTOM || topLookingAt == WorldTile.TREE_TOP) {
+								textBox.reset();
+								textBox.addPart("I doubt I could climb this tree.");
+							}
 						}
 
 					default: break;
@@ -163,25 +179,31 @@ public class World extends UpdatableLayer {
 	}
 
 	public boolean allowMovementTo(float x, float y, Direction d) {
+		if(x < 0 || x > LAYER_WIDTH * TILE_SIZE || y < 0 || y > LAYER_HEIGHT * TILE_SIZE) return false;
+
 		float yFraction = TILE_SIZE / 2.5f;
 		float xFraction = TILE_SIZE / 4.5f;
 
 		switch(d) {
 		case RIGHT:
 			return blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   x <= (LAYER_WIDTH - 1) * TILE_SIZE;
 
 		case LEFT:
 			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
+				   blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   x >= 0;
 
 		case DOWN:
 			return blockingLayer.getTileAt(x + xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + TILE_SIZE, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   y <= (LAYER_HEIGHT - 1) * TILE_SIZE;
 
 		case UP:
 			return blockingLayer.getTileAt(x + xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
-				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING;
+				   blockingLayer.getTileAt(x + TILE_SIZE - xFraction, y + yFraction, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT) == WorldTile.NOTHING &&
+				   y >= 0;
 		}
 		return true;
 	}
@@ -190,7 +212,14 @@ public class World extends UpdatableLayer {
 	public UpdatableLayer update(int time) {
 		textBox.update(time);
 
-		if(player != null) player.update(this, time);
+		if(player != null) {
+			player.update(this, time);
+
+			if(player.x <= 1) handlePlayerOffScreen(Direction.LEFT);
+			else if(player.x >= (LAYER_WIDTH - 1) * TILE_SIZE - 1) handlePlayerOffScreen(Direction.RIGHT);
+			if(player.y <= 1) handlePlayerOffScreen(Direction.UP);
+			else if(player.y >= (LAYER_HEIGHT - 1) * TILE_SIZE - 1) handlePlayerOffScreen(Direction.DOWN);
+		}
 
 		tileColourTimer += time;
 		if(tileColourTimer > 300) { // Change lamp colours ever 300ms:
@@ -206,14 +235,25 @@ public class World extends UpdatableLayer {
 	private void loadMap(final Assets assets, final String mapName) {
 		System.out.println("Loading map: " + mapName);
 
+		offScreenTextLines.clear();
+		offScreenMapNames.clear();
+
 		assets.getText(MAP_DIRECTORY_PATH + mapName + ".json").onSuccess(new Slot<String>() {
 			@Override
 			public void onEmit(String data) {
 				Json.Object obj = plat.json().parse(data);
 
-				if(obj.containsKey("sign text")) {
-					signTextLines = obj.getArray("sign text", String.class);
-				}
+				signTextLines = obj.getArray("sign text", String.class, null);
+
+				offScreenTextLines.put(Direction.LEFT, obj.getArray("left text", String.class, null));
+				offScreenTextLines.put(Direction.RIGHT, obj.getArray("right text", String.class, null));
+				offScreenTextLines.put(Direction.UP, obj.getArray("up text", String.class, null));
+				offScreenTextLines.put(Direction.DOWN, obj.getArray("down text", String.class, null));
+
+				offScreenMapNames.put(Direction.LEFT, obj.getString("left map", ""));
+				offScreenMapNames.put(Direction.RIGHT, obj.getString("right map", ""));
+				offScreenMapNames.put(Direction.UP, obj.getString("up map", ""));
+				offScreenMapNames.put(Direction.DOWN, obj.getString("down", ""));
 			}
 		});
 
@@ -265,5 +305,34 @@ public class World extends UpdatableLayer {
 	private void addTile(WorldTile tile, Texture tileset, int x, int y) {
 		Tile t = tileset.tile(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		worldTileTextures.put(tile, t);
+	}
+
+	private void handlePlayerOffScreen(Direction d) {
+		TypedArray<String> lines = offScreenTextLines.getOrDefault(d, null);
+
+		if(lines != null && textBox.isComplete()) {
+			textBox.reset();
+
+			for(String line : lines) {
+				System.out.println("Player moved off screen so displaying via text box UI: " + line);
+
+				textBox.addPart(line);
+			}
+		}
+
+		String mapName = offScreenMapNames.getOrDefault(d, "");
+
+		if(!mapName.isEmpty()) {
+			System.out.println("Player moved off screen so transitioning to specified level: " + mapName);
+
+			switch(d) {
+			case RIGHT: player.x = TILE_SIZE; break;
+			case LEFT: player.x  = (LAYER_WIDTH - 2) * TILE_SIZE; break;
+			case DOWN: player.y = TILE_SIZE; break;
+			case UP: player.y = (LAYER_HEIGHT - 2) * TILE_SIZE; break;
+			}
+
+			loadMap(plat.assets(), mapName);
+		}
 	}
 }
