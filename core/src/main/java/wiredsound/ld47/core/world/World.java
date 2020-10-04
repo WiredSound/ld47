@@ -30,7 +30,7 @@ public class World extends UpdatableLayer {
 	private Human player;
 
 	// Layers of the currently loaded world area/map:
-	private WorldLayer toppestLayer, topLayer, blockingLayer, bottomLayer;
+	private WorldLayer toppestLayer, topLayer, blockingLayer, bottomishLayer, bottomLayer;
 
 	private EntityLayer entitiesLayer;
 
@@ -48,6 +48,9 @@ public class World extends UpdatableLayer {
 
 	// Name of the map to transition to when the player moves off the screen in a given direction:
 	private HashMap<Direction, String> offScreenMapNames = new HashMap<Direction, String>();
+
+	// Story objectives:
+	private boolean obtainedGoldCoin = false;
 
 	public World(final Platform plat, final String mapName) {
 		super(plat);
@@ -92,11 +95,15 @@ public class World extends UpdatableLayer {
 				System.out.println("Created player character");
 
 				addTile(WorldTile.WOOD_FLOORING, tileset, 2, 2);
+				addTile(WorldTile.DAMAGED_WOOD_FLOOR, tileset, 3, 2);
 				addTile(WorldTile.BRICKS, tileset, 2, 4);
-				addTile(WorldTile.CRACKED_BRICKS, tileset, 3, 2);
+				addTile(WorldTile.BRICKS_END_LEFT, tileset, 4, 7);
+				addTile(WorldTile.CRACKED_BRICKS, tileset, 0, 4);
 				addTile(WorldTile.FANCY_BRICKS, tileset, 2, 3);
+				addTile(WorldTile.FANCY_BRICKS_END_LEFT, tileset, 4, 6);
 				addTile(WorldTile.VENT_BRICKS, tileset, 0, 3);
 				addTile(WorldTile.BRIDGE_PARAPET, tileset, 4, 2);
+				addTile(WorldTile.BRIDGE_PARAPET_END_LEFT, tileset, 4, 5);
 				addTile(WorldTile.BRIDGE_ARCHWAY_TOP_LEFT, tileset, 3, 3);
 				addTile(WorldTile.BRIDGE_ARCHWAY_TOP_RIGHT, tileset, 4, 3);
 				addTile(WorldTile.BRIDGE_ARCHWAY_LEFT, tileset, 3, 4);
@@ -111,9 +118,17 @@ public class World extends UpdatableLayer {
 				addTile(WorldTile.SIGN_BOTTOM, tileset, 0, 6);
 				addTile(WorldTile.MESSY_GRASS, tileset, 3, 5);
 				addTile(WorldTile.BUSH, tileset, 2, 5);
-				addTile(WorldTile.TREE_BOTTOM, tileset, 2, 7);
-				addTile(WorldTile.TREE_TOP, tileset, 2, 6);
-				addTile(WorldTile.TREE_CANOPY, tileset, 3, 6);
+				addTile(WorldTile.TREE_BOTTOM, tileset, 3, 7);
+				addTile(WorldTile.TREE_TOP, tileset, 3, 6);
+				addTile(WorldTile.TREE_CANOPY, tileset, 2, 6);
+				addTile(WorldTile.EXTENDED_FLOORING_ONE, tileset, 0, 7);
+				addTile(WorldTile.EXTENDED_FLOORING_TWO, tileset, 1, 7);
+				addTile(WorldTile.EXTENDED_FLOORING_THREE, tileset, 2, 7);
+				addTile(WorldTile.EXTENDED_FLOORING_FOUR, tileset, 0, 8);
+				addTile(WorldTile.WELL_TOP_LEFT, tileset, 3, 8);
+				addTile(WorldTile.WELL_TOP_RIGHT, tileset, 4, 8);
+				addTile(WorldTile.WELL_BOTTOM_LEFT, tileset, 3, 9);
+				addTile(WorldTile.WELL_BOTTOM_RIGHT, tileset, 4, 9);
 
 				System.out.println("Prepared world tiles");
 
@@ -147,18 +162,32 @@ public class World extends UpdatableLayer {
 						final WorldTile blockingLookingAt = blockingLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT);
 						final WorldTile topLookingAt = topLayer.getTileAt(lookingAtX, lookingAtY, TILE_SIZE, LAYER_WIDTH, LAYER_HEIGHT);
 
-						if(textBox.isComplete() && signTextLines != null) {
-							if(blockingLookingAt == WorldTile.SIGN_BOTTOM || topLookingAt == WorldTile.SIGN_TOP) {
+						System.out.println("Interacting with " + blockingLookingAt + " or " + topLookingAt);
+
+						if(textBox.isComplete()) {
+							if(signTextLines != null && (blockingLookingAt == WorldTile.SIGN_BOTTOM || topLookingAt == WorldTile.SIGN_TOP) ){
 								textBox.reset();
 								for(String line : signTextLines) textBox.addPart(line);
 							}
-							else if(blockingLookingAt == WorldTile.BUSH) {
+
+							if(blockingLookingAt == WorldTile.BUSH) {
 								textBox.reset();
 								textBox.addPart("I don't think rummaging around in a bush would be a good use of time right now.");
 							}
 							else if(blockingLookingAt == WorldTile.TREE_BOTTOM || topLookingAt == WorldTile.TREE_TOP) {
 								textBox.reset();
 								textBox.addPart("I doubt I could climb this tree.");
+							}
+							else if(blockingLookingAt == WorldTile.WELL_BOTTOM_LEFT || blockingLookingAt == WorldTile.WELL_BOTTOM_RIGHT ||
+									topLookingAt == WorldTile.WELL_TOP_LEFT || topLookingAt == WorldTile.WELL_TOP_RIGHT) {
+								textBox.reset();
+
+								textBox.addPart("It's a well.");
+								textBox.addPart("Unsuprisingly, it appears to have dried up long ago.");
+								textBox.addPart("Looks like there might be something at the bottom...");
+								textBox.addPart("(Antique gold coin found!)");
+
+								obtainedGoldCoin = true;
 							}
 						}
 
@@ -179,7 +208,7 @@ public class World extends UpdatableLayer {
 	}
 
 	public boolean allowMovementTo(float x, float y, Direction d) {
-		if(x < 0 || x > LAYER_WIDTH * TILE_SIZE || y < 0 || y > LAYER_HEIGHT * TILE_SIZE) return false;
+		if(blockingLayer == null || x < 0 || x > LAYER_WIDTH * TILE_SIZE || y < 0 || y > LAYER_HEIGHT * TILE_SIZE) return false;
 
 		float yFraction = TILE_SIZE / 2.5f;
 		float xFraction = TILE_SIZE / 4.5f;
@@ -253,7 +282,7 @@ public class World extends UpdatableLayer {
 				offScreenMapNames.put(Direction.LEFT, obj.getString("left map", ""));
 				offScreenMapNames.put(Direction.RIGHT, obj.getString("right map", ""));
 				offScreenMapNames.put(Direction.UP, obj.getString("up map", ""));
-				offScreenMapNames.put(Direction.DOWN, obj.getString("down", ""));
+				offScreenMapNames.put(Direction.DOWN, obj.getString("down map", ""));
 			}
 		});
 
@@ -262,32 +291,64 @@ public class World extends UpdatableLayer {
 			public void onEmit(String data) {
 				bottomLayer = newLayer(bottomLayer, data);
 
-				assets.getText(MAP_DIRECTORY_PATH + mapName + "_blocking.csv").onSuccess(new Slot<String>() {
+				assets.getText(MAP_DIRECTORY_PATH + mapName + "_bottomish.csv").onSuccess(new Slot<String>() {
 					@Override
 					public void onEmit(String data) {
-						blockingLayer = newLayer(blockingLayer, data);
+						bottomishLayer = newLayer(bottomishLayer, data);
 
-						// TODO: Load any entities specific to this map...
+						loadRemainingLayers(assets, mapName);
+					}
+				}).onFailure(new Slot<Throwable>() {
+					@Override
+					public void onEmit(Throwable event) {
+						System.out.println("This map does not have a 'bottomish' layer");
 
-						remove(entitiesLayer);
-						add(entitiesLayer);
+						if(bottomishLayer != null) {
+							remove(bottomishLayer);
+							bottomishLayer = null;
+						}
 
-						assets.getText(MAP_DIRECTORY_PATH + mapName + "_top.csv").onSuccess(new Slot<String>() {
+						loadRemainingLayers(assets, mapName);
+					}
+				});
+			}
+		});
+	}
+
+	private void loadRemainingLayers(final Assets assets, final String mapName) {
+		assets.getText(MAP_DIRECTORY_PATH + mapName + "_blocking.csv").onSuccess(new Slot<String>() {
+			@Override
+			public void onEmit(String data) {
+				blockingLayer = newLayer(blockingLayer, data);
+
+				// TODO: Load any entities specific to this map...
+
+				remove(entitiesLayer);
+				add(entitiesLayer);
+
+				assets.getText(MAP_DIRECTORY_PATH + mapName + "_top.csv").onSuccess(new Slot<String>() {
+					@Override
+					public void onEmit(String data) {
+						topLayer = newLayer(topLayer, data);
+
+						assets.getText(MAP_DIRECTORY_PATH + mapName + "_toppest.csv").onSuccess(new Slot<String>() {
 							@Override
 							public void onEmit(String data) {
-								topLayer = newLayer(topLayer, data);
+								toppestLayer = newLayer(toppestLayer, data);
 
-								assets.getText(MAP_DIRECTORY_PATH + mapName + "_toppest.csv").onSuccess(new Slot<String>() {
-									@Override
-									public void onEmit(String data) {
-										toppestLayer = newLayer(toppestLayer, data);
-
-										remove(textBox);
-										add(textBox);
-									}
-								});
+								remove(textBox);
+								add(textBox);
 							}
-						});
+						}).onFailure(new Slot<Throwable>() {
+							@Override
+							public void onEmit(Throwable e) {
+								System.out.println("This map does not have a 'toppest' layer");
+
+								if(toppestLayer != null) {
+									remove(toppestLayer);
+									toppestLayer = null;
+								}
+							}});
 					}
 				});
 			}

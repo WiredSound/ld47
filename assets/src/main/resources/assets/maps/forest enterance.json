@@ -1,0 +1,5 @@
+{
+    "left text": [ "I shouldn't wander too deep into the forest.", "I don't want to get lost." ],
+    "right map": "forest",
+    "down map": "start"
+}
