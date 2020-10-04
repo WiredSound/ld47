@@ -97,7 +97,7 @@ public class Human extends Entity {
 					y = newY;
 				}
 				else {
-					System.out.println("Movement of " + name + " from (" + x + ", " + x + ") in direction " + d + " was not allowed");
+					System.out.println("Movement of " + name + " from (" + x + ", " + y + ") in direction " + d + " was not allowed");
 				}
 			}
 		}
