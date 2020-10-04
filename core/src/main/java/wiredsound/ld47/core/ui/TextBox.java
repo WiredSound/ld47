@@ -16,7 +16,7 @@ import wiredsound.ld47.core.UpdatableLayer;
 
 public class TextBox extends UpdatableLayer {
 	private static final int TEXT_COLOUR = 0xFFCCCCCC;
-	private static final int BACKGROUND_COLOUR = 0xAA000000;
+	private static final int BACKGROUND_COLOUR = 0xDD000000;
 
 	private TextFormat format;
 	private TextWrap wrapping;
