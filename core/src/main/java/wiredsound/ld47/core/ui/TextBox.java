@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import playn.core.Canvas;
 import playn.core.Font;
 import playn.core.Graphics;
+import playn.core.Keyboard;
+import playn.core.Keyboard.KeyEvent;
 import playn.core.Platform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
@@ -44,6 +46,13 @@ public class TextBox extends UpdatableLayer {
 
 		textBoxLayer = new CanvasLayer(plat.graphics(), size.width() * 0.92f, size.height() * 0.1f);
 		addCenterAt(textBoxLayer, size.width() / 2, textCentreHeight);
+
+		plat.input().keyboardEvents.connect(new Keyboard.KeySlot() {
+			@Override
+			public void onEmit(KeyEvent e) {
+				if(e.down) { nextPart(); }
+			}
+		});
 	}
 
 	@Override
@@ -57,6 +66,7 @@ public class TextBox extends UpdatableLayer {
 			}
 			else {
 				fadeIn = false;
+				if(textLayer != null) textLayer.setVisible(true);
 				nextPart();
 			}
 		}
@@ -65,52 +75,54 @@ public class TextBox extends UpdatableLayer {
 			textBoxWidth -= time * 0.8;
 
 			if(textBoxWidth > 0) drawTextBox();
-			else textBoxLayer.setVisible(false);
+			else setVisible(false);
 		}
 
 		return null;
 	}
 
 	public void nextPart() {
-		Graphics gfx = plat.graphics();
+		if(!fadeIn && !fadeOut) {
+			Graphics gfx = plat.graphics();
 
-		if(parts.isEmpty()) {
-			//System.out.println("All script parts have already been displayed");
+			if(parts.isEmpty()) {
+				if(textLayer != null) textLayer.setVisible(false);
+				fadeOut = true;
+			}
+			else {
+				TextLayout[] lines = parts.get(0);
 
-			textLayer.setVisible(false);
-			fadeOut = true;
-		}
-		else {
-			TextLayout[] lines = parts.get(0);
+				if(lines.length > 0) {
+					System.out.println("Showing next section in text box: " + lines[0].text);
 
-			System.out.println("Transitioning to next script part");
+					Canvas canvas = gfx.createCanvas(lines[0].size.width(), lines[0].size.height() * lines.length);
+					canvas.setFillColor(TEXT_COLOUR);
 
-			if(lines.length > 0) {
-				Canvas canvas = gfx.createCanvas(lines[0].size.width(), lines[0].size.height() * lines.length);
-				canvas.setFillColor(TEXT_COLOUR);
+					float y = 0;
 
-				float y = 0;
+					for(TextLayout line : lines) {
+						canvas.fillText(line, 0, y);
+						y += line.size.height();
+					}
 
-				for(TextLayout line : lines) {
-					canvas.fillText(line, 0, y);
-					y += line.size.height();
+					if(textLayer != null) remove(textLayer);
+
+					textLayer = new ImageLayer(canvas.toTexture(TEXTURE_CONFIG));
+					addCenterAt(textLayer, gfx.viewSize.width() / 2, textCentreHeight);
 				}
 
-				if(textLayer != null) remove(textLayer);
-
-				textLayer = new ImageLayer(canvas.toTexture(TEXTURE_CONFIG));
-				addCenterAt(textLayer, gfx.viewSize.width() / 2, textCentreHeight);
+				parts.remove(0);
 			}
-
-			parts.remove(0);
 		}
 	}
 
 	public void reset() {
-		textBoxLayer.setVisible(true);
+		parts.clear();
 		fadeOut = false;
 		fadeIn = true;
 		textBoxWidth = 0;
+		setVisible(true);
+		if(textLayer != null) textLayer.setVisible(false);
 	}
 
 	public void addPart(String line) {
@@ -119,7 +131,7 @@ public class TextBox extends UpdatableLayer {
 	}
 
 	public boolean isComplete() {
-		return parts.isEmpty() && !textBoxLayer.visible();
+		return parts.isEmpty() && !visible();
 	}
 
 	private void drawTextBox() {

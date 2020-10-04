@@ -3,8 +3,6 @@ package wiredsound.ld47.core.vn;
 import java.util.ArrayList;
 
 import playn.core.Color;
-import playn.core.Keyboard;
-import playn.core.Keyboard.KeyEvent;
 import playn.core.Platform;
 import react.Slot;
 import wiredsound.ld47.core.UpdatableLayer;
@@ -27,13 +25,6 @@ public class VisualNovel extends UpdatableLayer {
 		textBox = new TextBox(plat);
 
 		loadScript(scriptName);
-
-		plat.input().keyboardEvents.connect(new Keyboard.KeySlot() {
-			@Override
-			public void onEmit(KeyEvent e) {
-				if(e.down) { textBox.nextPart(); }
-			}
-		});
 	}
 
 	@Override

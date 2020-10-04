@@ -20,7 +20,11 @@ enum WorldTile {
 	DIRT(10, Colours.BROWN),
 	SIGN_TOP(25, Colours.LIGHT_BROWN),
 	SIGN_BOTTOM(30, Colours.LIGHT_BROWN),
-	MESSY_GRASS(28, Colours.GREEN);
+	MESSY_GRASS(28, Colours.GREEN),
+	BUSH(27, Colours.LIGHT_GREEN),
+	TREE_TOP(32, Colours.LIGHT_BROWN),
+	TREE_BOTTOM(37, Colours.LIGHT_BROWN),
+	TREE_CANOPY(33, Colours.LIGHT_GREEN);
 
 	final int id;
 	int[] colours;
@@ -56,6 +60,7 @@ final class Colours {
 	public static final int DARK_YELLOW = 0xFFE5E500;
 	public static final int[] LAMP_COLOURS = new int[] { DARK_YELLOW, YELLOW, LIGHT_YELLOW, YELLOW };
 	public static final int DARK_GREEN = 0xFF013208;
-	public static final int LIGHT_BROWN = 0xFFB5651D;
 	public static final int GREEN = 0xFF014F0C;
+	public static final int LIGHT_GREEN = 0xFF00A000;
+	public static final int LIGHT_BROWN = 0xFFB5651D;
 }
